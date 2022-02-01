@@ -22,7 +22,14 @@ public class Client {
             //create input stream to receive data from server
             fromServer = new DataInputStream(socket.getInputStream());
             toServer = new DataOutputStream(socket.getOutputStream());
-
+            while(true){
+                System.out.print("Send command to server:\t");
+                message = input.nextLine();
+                toServer.writeUTF(message);
+                if(message.equalsIgnoreCase("quit")) {
+                    break;
+                }
+            }
 
         }
         catch(IOException ex){
