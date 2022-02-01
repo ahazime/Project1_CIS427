@@ -13,6 +13,6 @@ public class Server {
     }//end main
 
     public static void createCommunicationLoop(){
-
+        System.out.println("Hello World!");
     }//end func
 }
