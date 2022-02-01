@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class Server {
     public static void main(String args[]){
-        //server function call
+        createCommunicationLoop();
     }//end main
 
     public static void createCommunicationLoop(){
