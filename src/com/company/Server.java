@@ -13,6 +13,21 @@ public class Server {
     }//end main
 
     public static void createCommunicationLoop(){
+        try {
+
+            //creates server socket
+            ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
+            
+            System.out.println("Server Started");
+
+            
+            //client socket 
+            Socket socket = serverSocket.accept();
+            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } //end try catch
+
 
     }//end func
 }
