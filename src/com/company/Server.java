@@ -4,6 +4,7 @@ package com.company;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Paths;
 
 public class Server {
     private static final int SERVER_PORT = 1619;
@@ -20,20 +21,33 @@ public class Server {
 
     private static String usingBufferedReader(String filePath)
     {
+        String search;
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader buffer = new BufferedReader(new FileReader(filePath)))
         {
 
             String sCurrentLine;
+
             while ((sCurrentLine = buffer.readLine()) != null)
             {
-                contentBuilder.append(sCurrentLine).append("\n");
+                for (int i = 0; i < 4; i++) {
+                    // If the line number = 2 retrieves the line
+                    if (i == 0) {
+                        sCurrentLine = buffer.readLine();
+                        System.out.println(sCurrentLine);
+                    }
+                    else
+                        buffer.readLine();
+                }
+               // contentBuilder.append(sCurrentLine).append("\n");
             }
+
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
+
         return contentBuilder.toString();
     }
 
