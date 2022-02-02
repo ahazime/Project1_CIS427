@@ -1,4 +1,4 @@
-//Project 1 Ali Hazime
+//Project 1 Ali Hazime Fatima Kourani
 package com.company;
 
 import java.io.DataInputStream;
@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
-    private static final int SERVER_PORT = 1613;
+    private static final int SERVER_PORT = 1619;
 
     public static void main(String[] args) {
         DataOutputStream toServer;
@@ -35,7 +35,7 @@ public class Client {
                     break;
                 }
                 if(message.equalsIgnoreCase("logout")){
-                    //socket.close() ~this was breaking it
+                    socket.close(); //this was breaking it
                     break;
                 }
 

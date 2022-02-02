@@ -1,3 +1,4 @@
+//Project 1 Ali Hazime Fatima Kourani
 package com.company;
 
 import java.io.DataInput;
@@ -8,7 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    private static final int SERVER_PORT = 1613;
+    private static final int SERVER_PORT = 1619;
 
     public static void main(String args[]){
         //server function call
@@ -17,68 +18,83 @@ public class Server {
     static boolean isLogged =  false;
 
     public static void createCommunicationLoop() {
-        boolean quit_flag = false;
-        while (true) { // loop to ensure that the server doesn't close
-                try {
+            try {
 
-                    //creates server socket
-                    ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
+                //creates server socket
+                ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
 
-                    System.out.println("Server Started");
+                System.out.println("Server Started");
 
+                //keeps the server open for new clients
+                while(!serverSocket.isClosed()){
                     //client socket
+                    System.out.println("Listening for new client...");
                     Socket socket = serverSocket.accept();
+                    System.out.println("New client connected!");
 
                     DataInputStream inputFromClient = new DataInputStream(socket.getInputStream());
                     DataOutputStream outputToClient = new DataOutputStream(socket.getOutputStream());
 
-                    String strReceived = inputFromClient.readUTF();
+                    boolean quit_flag = false;
 
-                    if(strReceived.equalsIgnoreCase("LOGIN")) {
-                        isLogged = true;
-                        System.out.print("Client is Logged On...");
-                        outputToClient.writeUTF("SUCCESS");
+                    //Initial communication loop
+                    while(!quit_flag){
+                        String strReceived = inputFromClient.readUTF();
 
-                        while(isLogged == true) {
+                        if(strReceived.equalsIgnoreCase("LOGIN")) {
+                            isLogged = true;
+                            System.out.println("Client is Logged On...");
+                            outputToClient.writeUTF("SUCCESS");
 
-                            strReceived = inputFromClient.readUTF();
+                            //client must log in before accessing other commands
+                            while(isLogged == true) {
 
-                            if(strReceived.equalsIgnoreCase("LOGOUT")) {
-                                System.out.println("200 OK");
-                                isLogged = false;
-                                serverSocket.close();
-                                socket.close();
-                            }
+                                strReceived = inputFromClient.readUTF();
 
-                            else if(strReceived.equalsIgnoreCase("quit")) {
-                                System.out.print("Shutting down server...");
-                                outputToClient.writeUTF("Shutting down server");
-                                quit_flag = true;
-                                serverSocket.close();
-                                socket.close();
-                                break;
-                            }
-                            else if(strReceived.equalsIgnoreCase("hello")){
-                                System.out.println("The client says hello");
-                                outputToClient.writeUTF("Hello client!");
-                            }
-                            else {
-                                System.out.println("Unknown command received:" + strReceived);
-                                outputToClient.writeUTF("Unknown command." + "Please try again.");
+                                if(strReceived.equalsIgnoreCase("LOGOUT")) {
+                                    //disconnects client but keeps server running
+                                    System.out.println("200 OK");
+                                    isLogged = false;
+                                    quit_flag=true;
+                                    socket.close();
+                                    break;
+                                }
+
+                                else if(strReceived.equalsIgnoreCase("quit")) {
+                                    System.out.println("Shutting down server...");
+                                    outputToClient.writeUTF("Shutting down server");
+                                    quit_flag = true;
+                                    serverSocket.close();
+                                    socket.close();
+                                    break;
+                                }
+                                else if(strReceived.equalsIgnoreCase("hello")){
+                                    System.out.println("The client says hello");
+                                    outputToClient.writeUTF("Hello client!");
+                                }
+                                else {
+                                    System.out.println("Unknown command received:" + strReceived);
+                                    outputToClient.writeUTF("Unknown command." + "Please try again.");
+                                }
                             }
                         }
+                        else {
+                            System.out.println("Client not logged in");
+                            outputToClient.writeUTF("Error." + "Please log in first.");
+                        }
+                        /*(if(quit_flag){
+                            break;
+                        }*/
+                    }//end communication loop
 
-                    }
+                }//end server socket loop
 
-                    if(quit_flag){
-                        break;
-                    }
-                }
-                catch (IOException ex) {
-                    ex.printStackTrace();
-                } //end try catch
+            }
+            catch (IOException ex) {
+                ex.printStackTrace();
+            } //end try catch
 
 
-            }//end of loop
+
     }//end func
 }
