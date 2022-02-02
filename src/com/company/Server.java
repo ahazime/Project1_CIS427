@@ -1,20 +1,43 @@
 //Project 1 Ali Hazime Fatima Kourani
 package com.company;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
     private static final int SERVER_PORT = 1619;
 
-    public static void main(String args[]){
+    public static void main(String args[]) throws Exception {
+
+        String filePath = "C:\\Users\\koura\\Desktop\\logins.txt";
+        System.out.println(usingBufferedReader(filePath));
+
         //server function call
         createCommunicationLoop();
+
+
     }//end main
+
+    private static String usingBufferedReader(String filePath)
+    {
+        StringBuilder contentBuilder = new StringBuilder();
+        try (BufferedReader buffer = new BufferedReader(new FileReader(filePath)))
+        {
+
+            String sCurrentLine;
+            while ((sCurrentLine = buffer.readLine()) != null)
+            {
+                contentBuilder.append(sCurrentLine).append("\n");
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return contentBuilder.toString();
+    }
+
     static boolean isLogged =  false;
 
     public static void createCommunicationLoop() {
@@ -27,6 +50,7 @@ public class Server {
 
                 //keeps the server open for new clients
                 while(!serverSocket.isClosed()){
+
                     //client socket
                     System.out.println("Listening for new client...");
                     Socket socket = serverSocket.accept();
@@ -45,6 +69,7 @@ public class Server {
                             isLogged = true;
                             System.out.println("Client is Logged On...");
                             outputToClient.writeUTF("SUCCESS");
+
 
                             //client must log in before accessing other commands
                             while(isLogged == true) {
@@ -77,11 +102,12 @@ public class Server {
                                     outputToClient.writeUTF("Unknown command." + "Please try again.");
                                 }
                             }
-                        }
+                        }//end login if statement
                         else {
                             System.out.println("Client not logged in");
                             outputToClient.writeUTF("Error." + "Please log in first.");
                         }
+
                         /*(if(quit_flag){
                             break;
                         }*/
@@ -93,8 +119,5 @@ public class Server {
             catch (IOException ex) {
                 ex.printStackTrace();
             } //end try catch
-
-
-
     }//end func
 }
