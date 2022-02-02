@@ -1,4 +1,4 @@
-//Project 1 Ali Hazime
+//Project 1 Ali Hazime Fatima Kourani
 package com.company;
 
 import java.io.DataInputStream;
@@ -18,17 +18,29 @@ public class Client {
 
         //attempt to connect to server
         try{
+
             Socket socket = new Socket("localhost",SERVER_PORT);
+
             //create input stream to receive data from server
             fromServer = new DataInputStream(socket.getInputStream());
             toServer = new DataOutputStream(socket.getOutputStream());
+
             while(true){
+
                 System.out.print("Send command to server:\t");
                 message = input.nextLine();
                 toServer.writeUTF(message);
                 if(message.equalsIgnoreCase("quit")) {
+                    socket.close();
                     break;
                 }
+                if(message.equalsIgnoreCase("logout")){
+                    socket.close(); //this was breaking it
+                    break;
+                }
+
+                message = fromServer.readUTF();
+                System.out.println("Server says: " + message);
             }
 
         }
