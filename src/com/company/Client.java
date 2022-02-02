@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
-    private static final int SERVER_PORT = 1619;
+    private static final int SERVER_PORT = 1613;
 
     public static void main(String[] args) {
         DataOutputStream toServer;
@@ -18,17 +18,25 @@ public class Client {
 
         //attempt to connect to server
         try{
+
             Socket socket = new Socket("localhost",SERVER_PORT);
+
             //create input stream to receive data from server
             fromServer = new DataInputStream(socket.getInputStream());
             toServer = new DataOutputStream(socket.getOutputStream());
+
             while(true){
+
                 System.out.print("Send command to server:\t");
                 message = input.nextLine();
                 toServer.writeUTF(message);
                 if(message.equalsIgnoreCase("quit")) {
+                    socket.close();
                     break;
                 }
+
+                message = fromServer.readUTF();
+                System.out.println("Server says: " + message);
             }
 
         }
