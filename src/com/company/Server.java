@@ -10,12 +10,11 @@ public class Server {
 
     public static void main(String args[]) throws Exception {
 
-        String filePath = "C:\\Users\\koura\\Desktop\\logins.txt";
+        String filePath = "logins.txt";
         System.out.println(usingBufferedReader(filePath));
 
         //server function call
         createCommunicationLoop();
-
 
     }//end main
 
