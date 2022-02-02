@@ -34,6 +34,10 @@ public class Client {
                     socket.close();
                     break;
                 }
+                if(message.equalsIgnoreCase("logout")){
+                    //socket.close() ~this was breaking it
+                    break;
+                }
 
                 message = fromServer.readUTF();
                 System.out.println("Server says: " + message);

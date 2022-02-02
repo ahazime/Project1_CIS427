@@ -17,8 +17,8 @@ public class Server {
     static boolean isLogged =  false;
 
     public static void createCommunicationLoop() {
-
-        while (true) {
+        boolean quit_flag = false;
+        while (true) { // loop to ensure that the server doesn't close
                 try {
 
                     //creates server socket
@@ -41,38 +41,44 @@ public class Server {
 
                         while(isLogged == true) {
 
-                            String strReceived2 = inputFromClient.readUTF();
+                            strReceived = inputFromClient.readUTF();
 
-                            if(strReceived2.equalsIgnoreCase("LOGOUT")) {
-                                System.out.println("Client Has Logged Out...");
+                            if(strReceived.equalsIgnoreCase("LOGOUT")) {
+                                System.out.println("200 OK");
                                 isLogged = false;
-                                outputToClient.writeUTF("200 OK");
                                 serverSocket.close();
                                 socket.close();
-
                             }
-                            String strReceived3 = inputFromClient.readUTF();
-                            if(strReceived3.equalsIgnoreCase("quit")) {
+
+                            else if(strReceived.equalsIgnoreCase("quit")) {
                                 System.out.print("Shutting down server...");
                                 outputToClient.writeUTF("Shutting down server");
+                                quit_flag = true;
                                 serverSocket.close();
                                 socket.close();
-
+                                break;
+                            }
+                            else if(strReceived.equalsIgnoreCase("hello")){
+                                System.out.println("The client says hello");
+                                outputToClient.writeUTF("Hello client!");
                             }
                             else {
                                 System.out.println("Unknown command received:" + strReceived);
                                 outputToClient.writeUTF("Unknown command." + "Please try again.");
                             }
                         }
+
                     }
 
-
+                    if(quit_flag){
+                        break;
+                    }
                 }
                 catch (IOException ex) {
                     ex.printStackTrace();
                 } //end try catch
 
 
-            }//end func
-    }
+            }//end of loop
+    }//end func
 }
