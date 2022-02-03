@@ -20,16 +20,11 @@ public class Server {
 
             while (line != null) {
 
-                // prints first user + pass
-                String users = line.split(" ")[0];
-                String passwords = line.split(" ")[1];
-                // System.out.println(user1);
-                //System.out.println(pass1);
-                list.add(users);
-                list.add(passwords);
+                // lists user and pass
+                list.add(line.split(" ")[0]);
+                list.add(line.split(" ")[1]);
                 line = reader.readLine();
                 System.out.println(list);
-                // break;
 
             }//end loop
             reader.close();
