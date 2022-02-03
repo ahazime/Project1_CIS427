@@ -10,32 +10,50 @@ public class Server {
 
     public static void main(String args[]) throws Exception {
 
-        String filePath = "logins.txt";
-        System.out.println(usingBufferedReader(filePath));
 
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader("logins.txt"));
+            String line = reader.readLine();
+            while (line != null) {
+
+                String user1 = line.split(" ")[0];
+                String pass1 = line.split(" ")[1];
+
+               // prints first user + pass
+                System.out.println(user1);
+                System.out.println(pass1);
+
+                // read next line
+                String line2 = reader.readLine();
+                String user2 = line2.split(" ")[0];
+                String pass2 = line2.split(" ")[1];
+                System.out.println(user2);
+                System.out.println(pass2);
+
+                String line3 = reader.readLine();
+                String user3 = line3.split(" ")[0];
+                String pass3 = line3.split(" ")[1];
+                System.out.println(user3);
+                System.out.println(pass3);
+
+                String line4 = reader.readLine();
+                String user4 = line4.split(" ")[0];
+                String pass4 = line4.split(" ")[1];
+                System.out.println(user4);
+                System.out.println(pass4);
+                break;
+
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //server function call
         createCommunicationLoop();
 
     }//end main
 
-    private static String usingBufferedReader(String filePath)
-    {
-        StringBuilder contentBuilder = new StringBuilder();
-        try (BufferedReader buffer = new BufferedReader(new FileReader(filePath)))
-        {
-
-            String sCurrentLine;
-            while ((sCurrentLine = buffer.readLine()) != null)
-            {
-                contentBuilder.append(sCurrentLine).append("\n");
-            }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return contentBuilder.toString();
-    }
 
     static boolean isLogged =  false;
 
