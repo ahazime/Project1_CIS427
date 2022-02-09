@@ -4,6 +4,8 @@ package com.company;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,15 +31,38 @@ public class Server {
             List<String> users = new ArrayList<String>();
             List<String> passwords = new ArrayList<String>();
             String[] message;
+
             while (line != null) {
 
                 // lists user and pass
                 users.add(line.split(" ")[0]);
+
+                try {
+                   File myObj = new File( line.split(" ")[0] +"_solutions.txt");
+                   Path files = Path.of(line.split(" ")[0] +"_solutions.txt");
+                    FileWriter myWriter = new FileWriter(myObj);
+                    String content = "No interactions yet";
+                    if (myObj.createNewFile()) {
+                        System.out.println("File created: " + myObj.getName());
+                        Files.writeString(files, content);
+
+                    } else {
+                        System.out.println("File already exists.");
+                        Files.writeString(files, content);
+                    }
+
+                } catch (IOException e) {
+                    System.out.println("An error occurred.");
+                    e.printStackTrace();
+                }
+
                 passwords.add(line.split(" ")[1]);
                 line = reader.readLine();
 
             }//end loop
             reader.close();
+
+
 
             System.out.println(users.size());
 
@@ -48,12 +73,13 @@ public class Server {
 
             boolean quit_flag;
             boolean user_flag, pass_flag;
-            String currentUser=null;
-            int x=0,y=0;
+            String currentUser = null;
+            int x = 0, y = 0;
 
             //keeps the server open for new clients
             while(!serverSocket.isClosed()){
                 quit_flag=false;
+
                 //client socket
                 System.out.println("Listening for new client...");
                 Socket socket = serverSocket.accept();
@@ -119,6 +145,7 @@ public class Server {
                             socket.close();
                             break;
                         }
+
                         else if(message[0].equalsIgnoreCase("quit")) {
                             System.out.println("Shutting down server...");
                             outputToClient.writeUTF("Shutting down server");
@@ -127,15 +154,20 @@ public class Server {
                             socket.close();
                             break;
                         }
+
                         else if(message[0].equalsIgnoreCase("hello")){
                             System.out.println("The "+ currentUser +" says hello");
-                            outputToClient.writeUTF("Hello "+currentUser+"!");
+                            outputToClient.writeUTF("Hello "+ currentUser +"!");
                         }
+
                         else if(message[0].equalsIgnoreCase("SOLVE")){
+
+
                             if(message.length < 3 || message.length > 4){
                                 System.out.println("Invalid format entered");
                                 outputToClient.writeUTF("Error:" + " Please enter an equation type. -r or -c");
                             }
+
                             else if(message.length >= 3){
                                 //logic for rectangle
                                 if(message[1].equalsIgnoreCase("-r")){
@@ -174,6 +206,7 @@ public class Server {
                                        }
                                    }
                                 }
+
                                 else{
                                     System.out.println("Invalid equation type entered");
                                     outputToClient.writeUTF("Error." + "Please enter an equation type. -r or -c");
