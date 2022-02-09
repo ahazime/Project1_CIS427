@@ -49,6 +49,7 @@ public class Server {
             boolean quit_flag;
             boolean user_flag, pass_flag;
             String currentUser=null;
+            int x=0,y=0;
 
             //keeps the server open for new clients
             while(!serverSocket.isClosed()){
@@ -68,6 +69,7 @@ public class Server {
                     String strReceived = inputFromClient.readUTF();
                     message = strReceived.split(" ",3);
 
+                    //login conditional check
                     if(message[0].equalsIgnoreCase("LOGIN")) {
                         user_flag = false;
 
@@ -101,11 +103,13 @@ public class Server {
                         System.out.println("Client not logged in");
                         outputToClient.writeUTF("Error." + "Please log in first.");
                     }
+
                     //client must log in before accessing other commands
+                    //begin log in loop
                     while(isLogged == true) {
 
                         strReceived = inputFromClient.readUTF();
-                        message = strReceived.split(" ",3);
+                        message = strReceived.split(" ",4);
 
                         if(message[0].equalsIgnoreCase("LOGOUT")) {
                             //disconnects client but keeps server running
@@ -115,7 +119,6 @@ public class Server {
                             socket.close();
                             break;
                         }
-
                         else if(message[0].equalsIgnoreCase("quit")) {
                             System.out.println("Shutting down server...");
                             outputToClient.writeUTF("Shutting down server");
@@ -128,15 +131,60 @@ public class Server {
                             System.out.println("The "+ currentUser +" says hello");
                             outputToClient.writeUTF("Hello "+currentUser+"!");
                         }
+                        else if(message[0].equalsIgnoreCase("SOLVE")){
+                            if(message.length < 3 || message.length > 4){
+                                System.out.println("Invalid format entered");
+                                outputToClient.writeUTF("Error:" + " Please enter an equation type. -r or -c");
+                            }
+                            else if(message.length >= 3){
+                                //logic for rectangle
+                                if(message[1].equalsIgnoreCase("-r")){
+                                    try{
+                                        x = Integer.parseInt(message[2]);
+                                        if(message.length > 3){
+                                            y = Integer.parseInt(message[3]);
+                                        }
+                                        else{
+                                            y = x;
+                                        }
+
+                                        System.out.println("Returning perimeter and area of rectangle");
+                                        outputToClient.writeUTF("Perimeter: "+ 2*(x+y) +" Area: "+ x*y);
+                                    }
+                                    catch(Exception ex){
+                                        System.out.println("Syntax error");
+                                        outputToClient.writeUTF("Error: Invalid syntax");
+                                    }
+                                }
+                                //logic for circle
+                                else if(message[1].equalsIgnoreCase("-c")){
+                                   if(message.length > 3){
+                                       System.out.println("Arguments error");
+                                       outputToClient.writeUTF("Error: Too many arguments for circle");
+                                   }
+                                   else{
+                                       try{
+                                           x = Integer.parseInt(message[2]);
+                                           System.out.println("Returning circumference and area of circle");
+                                           outputToClient.writeUTF("Circumference: "+ 2*3.14*x +" Area: "+ 3.14*x*x);
+                                       }
+                                       catch(Exception ex){
+                                           System.out.println("Syntax error");
+                                           outputToClient.writeUTF("Error: Invalid syntax");
+                                       }
+                                   }
+                                }
+                                else{
+                                    System.out.println("Invalid equation type entered");
+                                    outputToClient.writeUTF("Error." + "Please enter an equation type. -r or -c");
+                                }
+                            }
+                        }
                         else {
                             System.out.println("Unknown command received:" + strReceived);
                             outputToClient.writeUTF("Unknown command." + "Please try again.");
                         }
                     }
-
-                        /*(if(quit_flag){
-                            break;
-                        }*/
                 }//end communication loop
 
             }//end server socket loop
@@ -146,4 +194,6 @@ public class Server {
             ex.printStackTrace();
         } //end try catch
     }//end func
+
+
 }
