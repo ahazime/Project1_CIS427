@@ -31,17 +31,18 @@ public class Server {
             List<String> users = new ArrayList<String>();
             List<String> passwords = new ArrayList<String>();
             String[] message;
-
+            String content = "No interactions yet\n";
+            // lists user and pass
+            Path files = Path.of(line.split(" ")[0] +"_solutions.txt");
             while (line != null) {
 
-                // lists user and pass
-                users.add(line.split(" ")[0]);
 
                 try {
-                   File myObj = new File( line.split(" ")[0] +"_solutions.txt");
-                   Path files = Path.of(line.split(" ")[0] +"_solutions.txt");
-                    FileWriter myWriter = new FileWriter(myObj);
-                    String content = "No interactions yet";
+                    users.add(line.split(" ")[0]);
+                    //FileWriter myWriter = new FileWriter(myObj);
+                    File myObj = new File( line.split(" ")[0] +"_solutions.txt");
+
+
                     if (myObj.createNewFile()) {
                         System.out.println("File created: " + myObj.getName());
                         Files.writeString(files, content);
@@ -141,7 +142,9 @@ public class Server {
                             //disconnects client but keeps server running
                             System.out.println("200 OK");
                             isLogged = false;
-                            quit_flag=true;
+                            quit_flag = true;
+
+
                             socket.close();
                             break;
                         }
@@ -162,7 +165,6 @@ public class Server {
 
                         else if(message[0].equalsIgnoreCase("SOLVE")){
 
-
                             if(message.length < 3 || message.length > 4){
                                 System.out.println("Invalid format entered");
                                 outputToClient.writeUTF("Error:" + " Please enter an equation type. -r or -c");
@@ -175,6 +177,12 @@ public class Server {
                                         x = Integer.parseInt(message[2]);
                                         if(message.length > 3){
                                             y = Integer.parseInt(message[3]);
+
+                                            content = content.concat("sides ");
+                                            content = content.concat(String.valueOf(x + " "));
+                                            content = content.concat(String.valueOf(y) + ": ");
+                                           Files.writeString(files, content);
+                                           System.out.println(content);
                                         }
                                         else{
                                             y = x;
