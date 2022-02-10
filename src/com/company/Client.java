@@ -35,7 +35,7 @@ public class Client {
                     break;
                 }
                 if(message.equalsIgnoreCase("logout")){
-                    socket.close(); //this was breaking it
+                    socket.close();
                     break;
                 }
 
@@ -45,7 +45,7 @@ public class Client {
 
         }
         catch(IOException ex){
-            ex.printStackTrace();;
+            ex.printStackTrace();
         }//end try catch
     }//end main
 }

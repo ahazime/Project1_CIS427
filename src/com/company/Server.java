@@ -31,38 +31,30 @@ public class Server {
             List<String> users = new ArrayList<String>();
             List<String> passwords = new ArrayList<String>();
             String[] message;
-            String content = "No interactions yet\n";
+            String content = null;
             // lists user and pass
-            //Path files = Path.of(line.split(" ")[0] +"_solutions.txt");
+
             while (line != null) {
-                    users.add(line.split(" ")[0]);
-                    //FileWriter myWriter = new FileWriter(myObj);
-                    //File myObj = new File( line.split(" ")[0] +"_solutions.txt");
-
-
-                   /* if (myObj.createNewFile()) {
-                        System.out.println("File created: " + myObj.getName());
-                        Files.writeString(files, content);
-
-                    } else {
-                        System.out.println("File already exists.");
-                        Files.writeString(files, content);
-                    }*/
+                users.add(line.split(" ")[0]);
                 passwords.add(line.split(" ")[1]);
                 line = reader.readLine();
 
             }//end loop
             reader.close();
 
-            List<FileWriter> fileList = new ArrayList<>();
+            List<File> fileList = new ArrayList<>();
             for(int x=0; x<users.size();x++){
-                FileWriter myObj = new FileWriter( users.get(x) +"_solutions.txt");
-                myObj.write("hello");
+                File myObj = new File(users.get(x)+"_solutions.txt");
                 fileList.add(myObj);
+                FileWriter fw = new FileWriter(fileList.get(x));
+                fw.write("");
+                //fw.write("hello");
+                fw.flush();
+                fw.close();
             }
 
-            System.out.println(users.size());
-
+            System.out.println(fileList.size());
+            //fileList.get(0).append("hello");
             //creates server socket
             ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
 
@@ -173,17 +165,18 @@ public class Server {
                                         x = Integer.parseInt(message[2]);
                                         if(message.length > 3){
                                             y = Integer.parseInt(message[3]);
-
-                                            content = content.concat("sides ");
-                                            content = content.concat(String.valueOf(x + " "));
-                                            content = content.concat(String.valueOf(y) + ": ");
-                                           //Files.writeString(files, content);
-                                           System.out.println(content);
                                         }
                                         else{
                                             y = x;
                                         }
 
+                                        content = "Perimeter: "+ 2*(x+y) +" Area: "+ x*y;
+                                        System.out.println("before function");
+                                        appendString(users,fileList,currentUser,content);
+                                        System.out.println("after function");
+
+
+                                        System.out.println(content);
                                         System.out.println("Returning perimeter and area of rectangle");
                                         outputToClient.writeUTF("Perimeter: "+ 2*(x+y) +" Area: "+ x*y);
                                     }
@@ -232,5 +225,19 @@ public class Server {
         } //end try catch
     }//end func
 
+    //Function to append to files
+    public static void appendString(List<String> users,List<File> files, String currentUser, String content)throws IOException{
+        int x;
+        for(x = 0; x< users.size();x++){
+            if(currentUser.equalsIgnoreCase(users.get(x))){
+                break;
+            }
+        }
+
+        FileWriter fw = new FileWriter(files.get(x),true);
+        fw.write(content+"\n");
+        fw.flush();
+        fw.close();
+    }//end func
 
 }
