@@ -33,37 +33,33 @@ public class Server {
             String[] message;
             String content = "No interactions yet\n";
             // lists user and pass
-            Path files = Path.of(line.split(" ")[0] +"_solutions.txt");
+            //Path files = Path.of(line.split(" ")[0] +"_solutions.txt");
             while (line != null) {
-
-
-                try {
                     users.add(line.split(" ")[0]);
                     //FileWriter myWriter = new FileWriter(myObj);
-                    File myObj = new File( line.split(" ")[0] +"_solutions.txt");
+                    //File myObj = new File( line.split(" ")[0] +"_solutions.txt");
 
 
-                    if (myObj.createNewFile()) {
+                   /* if (myObj.createNewFile()) {
                         System.out.println("File created: " + myObj.getName());
                         Files.writeString(files, content);
 
                     } else {
                         System.out.println("File already exists.");
                         Files.writeString(files, content);
-                    }
-
-                } catch (IOException e) {
-                    System.out.println("An error occurred.");
-                    e.printStackTrace();
-                }
-
+                    }*/
                 passwords.add(line.split(" ")[1]);
                 line = reader.readLine();
 
             }//end loop
             reader.close();
 
-
+            List<FileWriter> fileList = new ArrayList<>();
+            for(int x=0; x<users.size();x++){
+                FileWriter myObj = new FileWriter( users.get(x) +"_solutions.txt");
+                myObj.write("hello");
+                fileList.add(myObj);
+            }
 
             System.out.println(users.size());
 
@@ -181,7 +177,7 @@ public class Server {
                                             content = content.concat("sides ");
                                             content = content.concat(String.valueOf(x + " "));
                                             content = content.concat(String.valueOf(y) + ": ");
-                                           Files.writeString(files, content);
+                                           //Files.writeString(files, content);
                                            System.out.println(content);
                                         }
                                         else{
