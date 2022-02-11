@@ -16,10 +16,9 @@ public class Server {
         //server function call
         createCommunicationLoop();
 
-    }//end main
+    } //end main
 
-
-    static boolean isLogged =  false;
+    static boolean isLogged = false;
 
     public static void createCommunicationLoop() {
         try {
@@ -28,8 +27,8 @@ public class Server {
 
             reader = new BufferedReader(new FileReader("logins.txt"));
             String line = reader.readLine();
-            List<String> users = new ArrayList<String>();
-            List<String> passwords = new ArrayList<String>();
+            List < String > users = new ArrayList < String > ();
+            List < String > passwords = new ArrayList < String > ();
             String[] message;
             String content = null;
             // lists user and pass
@@ -39,12 +38,12 @@ public class Server {
                 passwords.add(line.split(" ")[1]);
                 line = reader.readLine();
 
-            }//end loop
+            } //end loop
             reader.close();
 
-            List<File> fileList = new ArrayList<>();
-            for(int x=0; x<users.size();x++){
-                File myObj = new File(users.get(x)+"_solutions.txt");
+            List < File > fileList = new ArrayList < > ();
+            for (int x = 0; x < users.size(); x++) {
+                File myObj = new File(users.get(x) + "_solutions.txt");
                 fileList.add(myObj);
                 FileWriter fw = new FileWriter(fileList.get(x));
                 fw.write("");
@@ -66,8 +65,8 @@ public class Server {
             int x = 0, y = 0;
 
             //keeps the server open for new clients
-            while(!serverSocket.isClosed()){
-                quit_flag=false;
+            while (!serverSocket.isClosed()) {
+                quit_flag = false;
 
                 //client socket
                 System.out.println("Listening for new client...");
@@ -77,43 +76,40 @@ public class Server {
                 DataInputStream inputFromClient = new DataInputStream(socket.getInputStream());
                 DataOutputStream outputToClient = new DataOutputStream(socket.getOutputStream());
 
-
                 //Initial communication loop
-                while(!quit_flag){
+                while (!quit_flag) {
 
                     String strReceived = inputFromClient.readUTF();
-                    message = strReceived.split(" ",3);
+                    message = strReceived.split(" ", 3);
 
                     //login conditional check
-                    if(message[0].equalsIgnoreCase("LOGIN")) {
+                    if (message[0].equalsIgnoreCase("LOGIN")) {
                         user_flag = false;
 
-                        if(message.length < 3){
+                        if (message.length < 3) {
                             System.out.println("Client failed login...");
                             outputToClient.writeUTF("Please provide a username and password when logging in.");
-                        }
-                        else{
-                            for(int i=0; i<users.size();i++){
-                                if(message[1].equalsIgnoreCase(users.get(i)) && message[2].equalsIgnoreCase(passwords.get(i))){
+                        } else {
+                            for (int i = 0; i < users.size(); i++) {
+                                if (message[1].equalsIgnoreCase(users.get(i)) && message[2].equalsIgnoreCase(passwords.get(i))) {
                                     user_flag = true;
                                     currentUser = message[1];
                                 }
 
-                                if(user_flag){
+                                if (user_flag) {
                                     isLogged = true;
                                 }
                             }
-                            if(isLogged) {
-                                System.out.println("Client "+ currentUser +" is Logged On...");
-                                outputToClient.writeUTF("SUCCESS: logged in as "+ currentUser);
-                            }
-                            else{
+                            if (isLogged) {
+                                System.out.println("Client " + currentUser + " is Logged On...");
+                                outputToClient.writeUTF("SUCCESS: logged in as " + currentUser);
+                            } else {
                                 System.out.println("Client failed login...");
                                 outputToClient.writeUTF("Incorrect login info, please try again.");
                             }
                         }
 
-                    }//end login if statement
+                    } //end login if statement
                     else {
                         System.out.println("Client not logged in");
                         outputToClient.writeUTF("Error." + "Please log in first.");
@@ -121,123 +117,128 @@ public class Server {
 
                     //client must log in before accessing other commands
                     //begin log in loop
-                    while(isLogged == true) {
+                    while (isLogged == true) {
 
                         strReceived = inputFromClient.readUTF();
-                        message = strReceived.split(" ",4);
+                        message = strReceived.split(" ", 4);
 
-                        if(message[0].equalsIgnoreCase("LOGOUT")) {
+                        if (message[0].equalsIgnoreCase("LOGOUT")) {
                             //disconnects client but keeps server running
                             System.out.println("200 OK");
                             isLogged = false;
                             quit_flag = true;
 
-
                             socket.close();
                             break;
-                        }
-
-                        else if(message[0].equalsIgnoreCase("quit")) {
+                        } else if (message[0].equalsIgnoreCase("quit")) {
                             System.out.println("Shutting down server...");
                             outputToClient.writeUTF("Shutting down server");
                             quit_flag = true;
                             serverSocket.close();
                             socket.close();
                             break;
-                        }
+                        } else if (message[0].equalsIgnoreCase("hello")) {
+                            System.out.println("The " + currentUser + " says hello");
+                            outputToClient.writeUTF("Hello " + currentUser + "!");
+                        } else if (message[0].equalsIgnoreCase("SOLVE")) {
 
-                        else if(message[0].equalsIgnoreCase("hello")){
-                            System.out.println("The "+ currentUser +" says hello");
-                            outputToClient.writeUTF("Hello "+ currentUser +"!");
-                        }
+                            if (message.length < 3 || message.length > 4) {
 
-                        else if(message[0].equalsIgnoreCase("SOLVE")){
-
-                            if(message.length < 3 || message.length > 4){
                                 System.out.println("Invalid format entered");
                                 outputToClient.writeUTF("Error:" + " Please enter an equation type. -r or -c");
-                            }
-
-                            else if(message.length >= 3){
+                            } else if (message.length >= 3) {
                                 //logic for rectangle
-                                if(message[1].equalsIgnoreCase("-r")){
-                                    try{
+                                if (message[1].equalsIgnoreCase("-r")) {
+                                    try {
                                         x = Integer.parseInt(message[2]);
-                                        if(message.length > 3){
+                                        if (message.length > 3) {
                                             y = Integer.parseInt(message[3]);
-                                        }
-                                        else{
+                                        } else {
                                             y = x;
                                         }
 
-                                        content = "Perimeter: "+ 2*(x+y) +" Area: "+ x*y;
-                                        System.out.println("before function");
-                                        appendString(users,fileList,currentUser,content);
-                                        System.out.println("after function");
-
+                                        content = "Perimeter: " + 2 * (x + y) + " Area: " + x * y;
+                                        appendString(users, fileList, currentUser, content);
 
                                         System.out.println(content);
                                         System.out.println("Returning perimeter and area of rectangle");
-                                        outputToClient.writeUTF("Perimeter: "+ 2*(x+y) +" Area: "+ x*y);
-                                    }
-                                    catch(Exception ex){
+                                        outputToClient.writeUTF("Perimeter: " + 2 * (x + y) + " Area: " + x * y);
+                                    } catch (Exception ex) {
                                         System.out.println("Syntax error");
                                         outputToClient.writeUTF("Error: Invalid syntax");
                                     }
                                 }
                                 //logic for circle
-                                else if(message[1].equalsIgnoreCase("-c")){
-                                   if(message.length > 3){
-                                       System.out.println("Arguments error");
-                                       outputToClient.writeUTF("Error: Too many arguments for circle");
-                                   }
-                                   else{
-                                       try{
-                                           x = Integer.parseInt(message[2]);
-                                           System.out.println("Returning circumference and area of circle");
-                                           outputToClient.writeUTF("Circumference: "+ 2*3.14*x +" Area: "+ 3.14*x*x);
-                                       }
-                                       catch(Exception ex){
-                                           System.out.println("Syntax error");
-                                           outputToClient.writeUTF("Error: Invalid syntax");
-                                       }
-                                   }
-                                }
-
-                                else{
+                                else if (message[1].equalsIgnoreCase("-c")) {
+                                    if (message.length > 3) {
+                                        System.out.println("Arguments error");
+                                        outputToClient.writeUTF("Error: Too many arguments for circle");
+                                    } else {
+                                        try {
+                                            x = Integer.parseInt(message[2]);
+                                            System.out.println("Returning circumference and area of circle");
+                                            outputToClient.writeUTF("Circumference: " + 2 * 3.14 * x + " Area: " + 3.14 * x * x);
+                                            String info = "Circumference: " + 2 * 3.14 * x + " Area: " + 3.14 * x * x;
+                                            appendString(users, fileList, currentUser, info);
+                                        } catch (Exception ex) {
+                                            System.out.println("Syntax error");
+                                            outputToClient.writeUTF("Error: Invalid syntax");
+                                            appendString(users, fileList, currentUser, "Error: Invalid syntax");
+                                        }
+                                    }
+                                } else {
                                     System.out.println("Invalid equation type entered");
                                     outputToClient.writeUTF("Error." + "Please enter an equation type. -r or -c");
                                 }
                             }
-                        }
-                        else {
+                        } else if (message[0].equalsIgnoreCase("LIST")) {
+
+                            int i;
+                            for (i = 0; i < users.size(); i++) {
+                                if (currentUser.equalsIgnoreCase(users.get(i))) {
+                                    break;
+                                }
+                                else if (message[1].equalsIgnoreCase("-all") && currentUser.equalsIgnoreCase("root")) {
+                                    appendString(users, fileList, currentUser, "Error: Invalid syntax");
+                                }
+                            }
+                            reader = new BufferedReader(new FileReader(users.get(i) + "_solutions.txt"));
+                            StringBuilder sb = new StringBuilder();
+                            String q = reader.readLine();
+                            while (q != null) {
+                                sb.append(q).append("\n");
+                                q = reader.readLine();
+                            }
+                            String fileAsString = sb.toString();
+
+                            outputToClient.writeUTF(currentUser + "\n" + fileAsString);
+                        } else {
                             System.out.println("Unknown command received:" + strReceived);
                             outputToClient.writeUTF("Unknown command." + "Please try again.");
                         }
                     }
-                }//end communication loop
+                } //end communication loop
 
-            }//end server socket loop
+            } //end server socket loop
 
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         } //end try catch
-    }//end func
+    } //end func
 
     //Function to append to files
-    public static void appendString(List<String> users,List<File> files, String currentUser, String content)throws IOException{
+    public static void appendString(List < String > users, List < File > files, String currentUser, String content) throws IOException {
         int x;
-        for(x = 0; x< users.size();x++){
-            if(currentUser.equalsIgnoreCase(users.get(x))){
+        for (x = 0; x < users.size(); x++) {
+            if (currentUser.equalsIgnoreCase(users.get(x))) {
                 break;
             }
         }
 
-        FileWriter fw = new FileWriter(files.get(x),true);
-        fw.write(content+"\n");
+        FileWriter fw = new FileWriter(files.get(x), true);
+        fw.write(content + "\n");
         fw.flush();
         fw.close();
-    }//end func
+    } //end func
 
 }

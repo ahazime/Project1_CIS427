@@ -1,2 +1,0 @@
-Perimeter: 16 Area: 16
-Perimeter: 20 Area: 25

@@ -1,0 +1,4 @@
+Perimeter: 22 Area: 30
+Perimeter: 8 Area: 4
+Perimeter: 28 Area: 49
+Circumference: 0.0 Area: 0.0
