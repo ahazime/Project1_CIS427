@@ -30,11 +30,13 @@ public class Client {
                 System.out.print("Send command to server:\t");
                 message = input.nextLine();
                 toServer.writeUTF(message);
-                if(message.equalsIgnoreCase("quit")) {
+                if(message.equalsIgnoreCase("SHUTDOWN")) {
                     socket.close();
                     break;
                 }
                 if(message.equalsIgnoreCase("logout")){
+                    message = fromServer.readUTF();
+                    System.out.println("Server says: " + message);
                     socket.close();
                     break;
                 }
