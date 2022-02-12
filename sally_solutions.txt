@@ -1,3 +1,0 @@
-Perimeter: 22 Area: 30
-Perimeter: 20 Area: 25
-Circumference: 31.400000000000002 Area: 78.5

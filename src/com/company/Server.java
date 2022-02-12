@@ -191,27 +191,69 @@ public class Server {
                                     outputToClient.writeUTF("Error." + "Please enter an equation type. -r or -c");
                                 }
                             }
+                            //logic for LIST
                         } else if (message[0].equalsIgnoreCase("LIST")) {
-
-                            int i;
-                            for (i = 0; i < users.size(); i++) {
-                                if (currentUser.equalsIgnoreCase(users.get(i))) {
-                                    break;
+                            if(message.length > 1){
+                                if(message[1].equalsIgnoreCase("-all") && !currentUser.equalsIgnoreCase("root")){
+                                    System.out.println("Invalid -all request");
+                                    outputToClient.writeUTF("Error: Invalid permissions");
                                 }
-                                else if (message[1].equalsIgnoreCase("-all") && currentUser.equalsIgnoreCase("root")) {
-                                    appendString(users, fileList, currentUser, "Error: Invalid syntax");
+                                else if(message[1].equalsIgnoreCase("-all") && currentUser.equalsIgnoreCase("root")){
+                                    System.out.println("Root user requested list -all");
+                                    String fileAsString = "";
+                                    int flag;
+                                    for(int i = 0; i < users.size(); i++){
+                                        StringBuilder sb = new StringBuilder();
+                                        flag = 0;
+                                        reader = new BufferedReader(new FileReader(users.get(i)+"_solutions.txt"));
+                                        String q = reader.readLine();
+                                        while(q != null){
+                                            sb.append(q).append("\n");
+                                            q = reader.readLine();
+                                            flag++;
+                                        }
+                                        if(flag > 0){
+                                            fileAsString = fileAsString+"\n"+(users.get(i) +"\n"+ sb.toString());
+                                        }
+                                        else{
+                                            fileAsString = fileAsString +"\n"+(users.get(i) + "\n" + "No Commands Yet");
+                                        }
+                                        reader.close();
+                                    }
+                                    outputToClient.writeUTF("\n"+fileAsString);
+                                }
+                                else{
+                                    outputToClient.writeUTF("Error: Invalid Syntax");
                                 }
                             }
-                            reader = new BufferedReader(new FileReader(users.get(i) + "_solutions.txt"));
-                            StringBuilder sb = new StringBuilder();
-                            String q = reader.readLine();
-                            while (q != null) {
-                                sb.append(q).append("\n");
-                                q = reader.readLine();
+                            else{
+                                System.out.println("Listing for client...");
+                                int i;
+                                for (i = 0; i < users.size(); i++) {
+                                    if (currentUser.equalsIgnoreCase(users.get(i))) {
+                                        break;
+                                    }
+                                }
+                                reader = new BufferedReader(new FileReader(users.get(i) + "_solutions.txt"));
+                                StringBuilder sb = new StringBuilder();
+                                String q = reader.readLine();
+                                int flag = 0;
+                                while (q != null) {
+                                    sb.append(q).append("\n");
+                                    q = reader.readLine();
+                                    flag++;
+                                }
+                                String fileAsString;
+                                if(flag > 0){
+                                    fileAsString = sb.toString();
+                                }
+                                else{
+                                    fileAsString = "No Commands Yet";
+                                }
+                                outputToClient.writeUTF(currentUser + "\n" + fileAsString);
+                                reader.close();
                             }
-                            String fileAsString = sb.toString();
 
-                            outputToClient.writeUTF(currentUser + "\n" + fileAsString);
                         } else {
                             System.out.println("Unknown command received:" + strReceived);
                             outputToClient.writeUTF("Unknown command." + "Please try again.");
