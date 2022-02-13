@@ -27,8 +27,8 @@ public class Server {
 
             reader = new BufferedReader(new FileReader("logins.txt"));
             String line = reader.readLine();
-            List < String > users = new ArrayList < String > ();
-            List < String > passwords = new ArrayList < String > ();
+            List<String> users = new ArrayList<String>();
+            List<String> passwords = new ArrayList<String>();
             String[] message;
             String content = null;
 
@@ -41,7 +41,7 @@ public class Server {
             } //end loop
             reader.close();
 
-            List < File > fileList = new ArrayList < > ();
+            List<File> fileList = new ArrayList<>();
             for (int x = 0; x < users.size(); x++) {
                 File myObj = new File(users.get(x) + "_solutions.txt");
                 fileList.add(myObj);
@@ -143,27 +143,25 @@ public class Server {
 
                             if (message.length < 3 || message.length > 4) {
 
-                                if(message.length == 2){
-                                    if(message[1].equalsIgnoreCase("-r")){
+                                if (message.length == 2) {
+                                    if (message[1].equalsIgnoreCase("-r")) {
                                         System.out.println("Invalid format entered");
                                         outputToClient.writeUTF("Error: No sides found");
-                                    }
-                                    else if(message[1].equalsIgnoreCase("-c")){
+                                        appendString(users, fileList, currentUser, "Error: No sides found");
+                                    } else if (message[1].equalsIgnoreCase("-c")) {
                                         System.out.println("Invalid format entered");
                                         outputToClient.writeUTF("Error: No radius found");
-                                    }
-                                    else {
+                                        appendString(users, fileList, currentUser, "Error: No radius found");
+                                    } else {
                                         System.out.println("Invalid format entered");
                                         outputToClient.writeUTF("301 message format error");
                                         System.out.println("Client says: " + strReceived);
                                     }
-                                }
-                                else {
+                                } else {
                                     System.out.println("Invalid format entered");
                                     outputToClient.writeUTF("301 message format error");
                                     System.out.println("Client says: " + strReceived);
                                 }
-
 
 
                             } else if (message.length >= 3) {
@@ -183,11 +181,10 @@ public class Server {
                                         System.out.println(content);
                                         System.out.println("Returning perimeter and area of rectangle");
                                         System.out.println("Client says: " + strReceived);
-                                        outputToClient.writeUTF("sides " + x + " " + y + ": " + "Rectangle’s perimeter is " + 2 * (x + y) + " and area is " + x * y);
+                                        outputToClient.writeUTF("Rectangle’s perimeter is " + 2 * (x + y) + " and area is " + x * y);
                                     } catch (Exception ex) {
                                         System.out.println("Syntax error");
                                         outputToClient.writeUTF("301 message format error");
-                                        appendString(users, fileList, currentUser, "Error: No sides found");
                                         System.out.println("Client says: " + strReceived);
                                     }
 
@@ -204,7 +201,7 @@ public class Server {
                                             x = Integer.parseInt(message[2]);
                                             System.out.println("Returning circumference and area of circle");
                                             outputToClient.writeUTF("Circle’s circumference is " + 2 * 3.14 * x + " and area is " + 3.14 * x * x);
-                                            String info = "Circle’s circumference is " + 2 * 3.14 * x + " and area is " + 3.14 * x * x;
+                                            String info = "radius " + x + ": " + "Circle’s circumference is " + 2 * 3.14 * x + " and area is " + 3.14 * x * x;
                                             appendString(users, fileList, currentUser, info);
                                             System.out.println("Client says: " + strReceived);
                                         } catch (Exception ex) {
@@ -224,44 +221,40 @@ public class Server {
                             //logic for LIST
                         } else if (message[0].equalsIgnoreCase("LIST")) {
                             System.out.println("Client says: " + strReceived);
-                            if(message.length > 1){
-                                if(message[1].equalsIgnoreCase("-all") && !currentUser.equalsIgnoreCase("root")){
+                            if (message.length > 1) {
+                                if (message[1].equalsIgnoreCase("-all") && !currentUser.equalsIgnoreCase("root")) {
                                     System.out.println("Invalid -all request");
                                     outputToClient.writeUTF("Error: you are not the root user");
                                     System.out.println("Client says: " + strReceived);
-                                }
-                                else if(message[1].equalsIgnoreCase("-all") && currentUser.equalsIgnoreCase("root")){
+                                } else if (message[1].equalsIgnoreCase("-all") && currentUser.equalsIgnoreCase("root")) {
                                     System.out.println("Root user requested list -all");
                                     System.out.println("Client says: " + strReceived);
                                     String fileAsString = "";
                                     int flag;
 
-                                    for(int i = 0; i < users.size(); i++){
+                                    for (int i = 0; i < users.size(); i++) {
                                         StringBuilder sb = new StringBuilder();
                                         flag = 0;
-                                        reader = new BufferedReader(new FileReader(users.get(i)+"_solutions.txt"));
+                                        reader = new BufferedReader(new FileReader(users.get(i) + "_solutions.txt"));
                                         String q = reader.readLine();
-                                        while(q != null){
+                                        while (q != null) {
                                             sb.append(q).append("\n");
                                             q = reader.readLine();
                                             flag++;
                                         }
-                                        if(flag > 0){
-                                            fileAsString = fileAsString+"\n"+(users.get(i) +"\n"+ sb.toString());
-                                        }
-                                        else{
-                                            fileAsString = fileAsString +"\n"+(users.get(i) + "\n" + "No interactions yet");
+                                        if (flag > 0) {
+                                            fileAsString = fileAsString + "\n" + (users.get(i) + "\n" + sb.toString());
+                                        } else {
+                                            fileAsString = fileAsString + "\n" + (users.get(i) + "\n" + "No interactions yet");
                                         }
                                         reader.close();
                                     }
-                                    outputToClient.writeUTF("\n"+fileAsString);
-                                }
-                                else{
+                                    outputToClient.writeUTF("\n" + fileAsString);
+                                } else {
                                     outputToClient.writeUTF("301 message format error");
                                     System.out.println("Client says: " + strReceived);
                                 }
-                            }
-                            else{
+                            } else {
                                 System.out.println("Listing for client...");
                                 int i;
                                 for (i = 0; i < users.size(); i++) {
@@ -279,10 +272,9 @@ public class Server {
                                     flag++;
                                 }
                                 String fileAsString;
-                                if(flag > 0){
+                                if (flag > 0) {
                                     fileAsString = sb.toString();
-                                }
-                                else{
+                                } else {
                                     fileAsString = "No interactions yet";
                                 }
                                 outputToClient.writeUTF(currentUser + "\n" + fileAsString);
@@ -305,7 +297,7 @@ public class Server {
     } //end func
 
     //Function to append to files
-    public static void appendString(List < String > users, List < File > files, String currentUser, String content) throws IOException {
+    public static void appendString(List<String> users, List<File> files, String currentUser, String content) throws IOException {
         int x;
         for (x = 0; x < users.size(); x++) {
             if (currentUser.equalsIgnoreCase(users.get(x))) {
