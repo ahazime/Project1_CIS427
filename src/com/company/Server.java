@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class Server {
             boolean user_flag, pass_flag;
             String currentUser = null;
             int x = 0, y = 0;
-
+            DecimalFormat df = new DecimalFormat("#.###");
             //keeps the server open for new clients
             while (!serverSocket.isClosed()) {
                 quit_flag = false;
@@ -89,7 +90,7 @@ public class Server {
 
                         if (message.length < 3) {
                             System.out.println("Client failed login...");
-                            outputToClient.writeUTF("FAILURE: Please provide correct username and password. Try again.");
+                            outputToClient.writeUTF("FAILURE: Please provide username and password. Try again.");
                         } else {
                             //loop and conditional to check if username and passwords are correct
                             for (int i = 0; i < users.size(); i++) {
@@ -106,18 +107,28 @@ public class Server {
                             if (isLogged) {
                                 System.out.println("Client " + currentUser + " is Logged On...");
                                 outputToClient.writeUTF("SUCCESS");
-                                //else if user fails to logs on
+                                //else if user fails to log on
                             } else {
                                 System.out.println("Client failed login...");
-                                outputToClient.writeUTF("FAILURE: Please provide correct username and password. Try again.");
+                                outputToClient.writeUTF("FAILURE: Please provide correct username and password.  Try again");
                             }
                         }
 
                     } //end login if statement
+                    else if (message[0].equalsIgnoreCase("SHUTDOWN")) {
+                        System.out.println("Client says: " + strReceived);
+                        System.out.println("Shutting down server...");
+                        outputToClient.writeUTF("200 OK");
+                        quit_flag = true;
+                        serverSocket.close();
+                        socket.close();
+                        break;
+
+                    }
                     else {
                         System.out.println("Client not logged in");
                         System.out.println("Client says: " + strReceived);
-                        outputToClient.writeUTF("FAILURE: Please provide correct username and password. Try again.");
+                        outputToClient.writeUTF("Error: Please log in.");
                     }
 
                     //client must log in before accessing other commands
@@ -143,7 +154,7 @@ public class Server {
                         } else if (message[0].equalsIgnoreCase("SHUTDOWN")) {
                             System.out.println("Client says: " + strReceived);
                             System.out.println("Shutting down server...");
-                            outputToClient.writeUTF("Shutting down server");
+                            outputToClient.writeUTF("200 OK");
                             quit_flag = true;
                             serverSocket.close();
                             socket.close();
@@ -211,16 +222,14 @@ public class Server {
                                         try {
                                             x = Integer.parseInt(message[2]);
                                             System.out.println("Returning circumference and area of circle");
-                                            outputToClient.writeUTF("Circle’s circumference is " + 2 * 3.14 * x + " and area is " + 3.14 * x * x);
-                                            String info = "radius " + x + ": " + "Circle’s circumference is " + 2 * 3.14 * x + " and area is " + 3.14 * x * x;
+                                            outputToClient.writeUTF("Circle’s circumference is " + df.format(2 * 3.14 * x) + " and area is " + df.format(3.14 * x * x));
+                                            String info = "radius " + x + ": " + "Circle’s circumference is " + df.format(2 * 3.14 * x) + " and area is " + df.format(3.14 * x * x);
                                             appendString(users, fileList, currentUser, info);
                                             System.out.println("Client says: " + strReceived);
                                         } catch (Exception ex) {
                                             System.out.println("Syntax error");
                                             outputToClient.writeUTF("301 message format error");
-                                            appendString(users, fileList, currentUser, "Error: No radius found");
                                             System.out.println("Client says: " + strReceived);
-
                                         }
                                     }
                                 } else {
@@ -260,7 +269,7 @@ public class Server {
                                         if (flag > 0) {
                                             fileAsString = fileAsString + "\n" + (users.get(i) + "\n" + sb.toString());
                                         } else {
-                                            fileAsString = fileAsString + "\n" + (users.get(i) + "\n" + "No interactions yet");
+                                            fileAsString = fileAsString + "\n" + (users.get(i) + "\n" + "No interactions yet\n");
                                         }
                                         reader.close();
                                     }
@@ -270,7 +279,7 @@ public class Server {
                                     System.out.println("Client says: " + strReceived);
                                 }
                             } else {
-                                System.out.println("Listing for client...");
+                                System.out.println("Listing command history for client...");
                                 int i;
                                 for (i = 0; i < users.size(); i++) {
                                     if (currentUser.equalsIgnoreCase(users.get(i))) {
@@ -291,7 +300,7 @@ public class Server {
                                 if (flag > 0) {
                                     fileAsString = sb.toString();
                                 } else {
-                                    fileAsString = "No interactions yet";
+                                    fileAsString = "No interactions yet\n";
                                 }
                                 outputToClient.writeUTF(currentUser + "\n" + fileAsString);
                                 reader.close();
