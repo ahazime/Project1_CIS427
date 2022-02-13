@@ -11,15 +11,15 @@ Command needed from client in order to access all other commands
 Returns the circumference or perimeter and area of numbers inputted  
 Creates or overwrites the user text file containing the user's solutions
 
-**LIST**  
+**LIST**:  
 Returns a list of the user's solutions to the user  
 Can only access solutions of the user who is logged in
 
-**SHUTDOWN**  
+**SHUTDOWN**:  
 Shuts server down when "SHUTDOWN" command is received from user  
 Closes all sockets and files and terminates the client and user
 
-**LOGOUT**  
+**LOGOUT**:  
 Terminates the client and not the server
 
 **HOW TO BUILD AND RUN PROGRAM**
