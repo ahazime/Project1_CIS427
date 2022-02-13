@@ -17,24 +17,24 @@ public class Client {
         String message;
 
         //attempt to connect to server
-        try{
+        try {
 
-            Socket socket = new Socket("localhost",SERVER_PORT);
+            Socket socket = new Socket("localhost", SERVER_PORT);
 
             //create input stream to receive data from server
             fromServer = new DataInputStream(socket.getInputStream());
             toServer = new DataOutputStream(socket.getOutputStream());
 
-            while(true){
+            while (true) {
 
                 System.out.print("Send command to server:\t");
                 message = input.nextLine();
                 toServer.writeUTF(message);
-                if(message.equalsIgnoreCase("SHUTDOWN")) {
+                if (message.equalsIgnoreCase("SHUTDOWN")) {
                     socket.close();
                     break;
                 }
-                if(message.equalsIgnoreCase("logout")){
+                if (message.equalsIgnoreCase("logout")) {
                     message = fromServer.readUTF();
                     System.out.println("Server says: " + message);
                     socket.close();
@@ -45,8 +45,7 @@ public class Client {
                 System.out.println("Server says: " + message);
             }
 
-        }
-        catch(IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }//end try catch
     }//end main

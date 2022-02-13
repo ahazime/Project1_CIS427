@@ -32,16 +32,18 @@ public class Server {
             String[] message;
             String content = null;
 
-
+            //loop to split and add users and passwords into list
             while (line != null) {
                 users.add(line.split(" ")[0]);
                 passwords.add(line.split(" ")[1]);
                 line = reader.readLine();
 
-            } //end loop
+            } //end while loop
             reader.close();
 
             List<File> fileList = new ArrayList<>();
+
+            //loop to create user files
             for (int x = 0; x < users.size(); x++) {
                 File myObj = new File(users.get(x) + "_solutions.txt");
                 fileList.add(myObj);
@@ -49,7 +51,7 @@ public class Server {
                 fw.write("");
                 fw.flush();
                 fw.close();
-            }
+            } //end for loop
 
             //creates server socket
             ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
@@ -76,10 +78,11 @@ public class Server {
                 //Initial communication loop
                 while (!quit_flag) {
 
+                    //Strings to split and hold client input
                     String strReceived = inputFromClient.readUTF();
                     message = strReceived.split(" ", 3);
 
-                    //login conditional check
+                    //login conditional check for commands
                     if (message[0].equalsIgnoreCase("LOGIN")) {
                         user_flag = false;
                         System.out.println("Client says: " + strReceived);
@@ -88,19 +91,22 @@ public class Server {
                             System.out.println("Client failed login...");
                             outputToClient.writeUTF("FAILURE: Please provide correct username and password. Try again.");
                         } else {
+                            //loop and conditional to check if username and passwords are correct
                             for (int i = 0; i < users.size(); i++) {
                                 if (message[1].equalsIgnoreCase(users.get(i)) && message[2].equalsIgnoreCase(passwords.get(i))) {
                                     user_flag = true;
                                     currentUser = message[1];
                                 }
-
+                                //conditional check for isLogged
                                 if (user_flag) {
                                     isLogged = true;
                                 }
                             }
+                            //conditional if user successfully logs on
                             if (isLogged) {
                                 System.out.println("Client " + currentUser + " is Logged On...");
                                 outputToClient.writeUTF("SUCCESS");
+                                //else if user fails to logs on
                             } else {
                                 System.out.println("Client failed login...");
                                 outputToClient.writeUTF("FAILURE: Please provide correct username and password. Try again.");
@@ -121,6 +127,7 @@ public class Server {
                         strReceived = inputFromClient.readUTF();
                         message = strReceived.split(" ", 4);
 
+                        //conditional for logout command
                         if (message[0].equalsIgnoreCase("LOGOUT")) {
                             //disconnects client but keeps server running
                             outputToClient.writeUTF("200 OK");
@@ -131,6 +138,8 @@ public class Server {
 
                             socket.close();
                             break;
+
+                            //conditional for shutdown command
                         } else if (message[0].equalsIgnoreCase("SHUTDOWN")) {
                             System.out.println("Client says: " + strReceived);
                             System.out.println("Shutting down server...");
@@ -139,10 +148,12 @@ public class Server {
                             serverSocket.close();
                             socket.close();
                             break;
+                            //conditional for solve command
                         } else if (message[0].equalsIgnoreCase("SOLVE")) {
 
                             if (message.length < 3 || message.length > 4) {
 
+                                //conditional invalid input for radius and sides
                                 if (message.length == 2) {
                                     if (message[1].equalsIgnoreCase("-r")) {
                                         System.out.println("Invalid format entered");
@@ -218,20 +229,24 @@ public class Server {
                                     System.out.println("Client says: " + strReceived);
                                 }
                             }
-                            //logic for LIST
+                            //logic for list command
                         } else if (message[0].equalsIgnoreCase("LIST")) {
                             System.out.println("Client says: " + strReceived);
+                            //logic for list -all command
                             if (message.length > 1) {
+                                //conditional for not root user requesting list -all access
                                 if (message[1].equalsIgnoreCase("-all") && !currentUser.equalsIgnoreCase("root")) {
                                     System.out.println("Invalid -all request");
                                     outputToClient.writeUTF("Error: you are not the root user");
                                     System.out.println("Client says: " + strReceived);
+                                    //conditional for root user requesting list -all access
                                 } else if (message[1].equalsIgnoreCase("-all") && currentUser.equalsIgnoreCase("root")) {
                                     System.out.println("Root user requested list -all");
                                     System.out.println("Client says: " + strReceived);
                                     String fileAsString = "";
                                     int flag;
 
+                                    //loop for printing to user files
                                     for (int i = 0; i < users.size(); i++) {
                                         StringBuilder sb = new StringBuilder();
                                         flag = 0;
@@ -272,6 +287,7 @@ public class Server {
                                     flag++;
                                 }
                                 String fileAsString;
+                                //conditionals for empty user files
                                 if (flag > 0) {
                                     fileAsString = sb.toString();
                                 } else {
@@ -296,7 +312,7 @@ public class Server {
         } //end try catch
     } //end func
 
-    //Function to append to files
+    //function to append to files
     public static void appendString(List<String> users, List<File> files, String currentUser, String content) throws IOException {
         int x;
         for (x = 0; x < users.size(); x++) {
