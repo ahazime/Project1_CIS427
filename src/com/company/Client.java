@@ -15,36 +15,55 @@ public class Client {
         DataInputStream fromServer;
         Scanner input = new Scanner(System.in);
         String message;
+        String[] messageArr;
 
         //attempt to connect to server
-        try{
-
-            Socket socket = new Socket("localhost",SERVER_PORT);
+        try {
+            boolean isLogged = false;
+            Socket socket = new Socket("localhost", SERVER_PORT);
 
             //create input stream to receive data from server
             fromServer = new DataInputStream(socket.getInputStream());
             toServer = new DataOutputStream(socket.getOutputStream());
 
-            while(true){
+            while (true) {
 
-                System.out.print("Send command to server:\t");
+                System.out.print("C: ");
                 message = input.nextLine();
                 toServer.writeUTF(message);
-                if(message.equalsIgnoreCase("quit")) {
+                messageArr = message.split(" ", 2);
+                if(messageArr[0].equalsIgnoreCase("LOGIN")){
+                    message = fromServer.readUTF();
+                    System.out.println("S: " + message);
+                    if(message.equalsIgnoreCase("SUCCESS")){
+                        isLogged = true;
+                    }
+                    else{
+                        isLogged = false;
+                    }
+                }
+                else if (message.equalsIgnoreCase("SHUTDOWN")) {
+                    message = fromServer.readUTF();
+                    System.out.println("S: " + message);
                     socket.close();
                     break;
                 }
-                if(message.equalsIgnoreCase("logout")){
+                else if (message.equalsIgnoreCase("LOGOUT")&&isLogged) {
+                    message = fromServer.readUTF();
+                    System.out.println("S: " + message);
                     socket.close();
                     break;
+
+                }
+                else{
+                    message = fromServer.readUTF();
+                    System.out.println("S: " + message);
+
                 }
 
-                message = fromServer.readUTF();
-                System.out.println("Server says: " + message);
             }
 
-        }
-        catch(IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }//end try catch
     }//end main
